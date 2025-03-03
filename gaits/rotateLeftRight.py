@@ -52,7 +52,7 @@ pointsPerSide = 15
 totalPoints = 45
 k = 1;
 while True:
-    if k == 1:#backleft
+    if k == 1:
         for i in range(totalPoints+1):
             if i < pointsPerSide:
                 x = i *  (base_length/pointsPerSide)
@@ -71,7 +71,7 @@ while True:
             print("y val")
             print(y)
             
-            distanceval = calculate_distance(x-15,y)
+            distanceval = calculate_distance(x,y)
             angleval = solve_angle_c(130,130, distanceval)
             subsubAngle = math.atan(x/y)
             subAngle = math.degrees(subsubAngle)
@@ -84,7 +84,7 @@ while True:
             set_servo_angle(6, (90 -((180-angleval)/2)) + subAngle/2)
             set_servo_angle(9, 180 - angleval)
     k = 2
-    if k == 2:#backright
+    if k == 2:
         for i in range(totalPoints+1):
             if i < pointsPerSide:
                 x = i *  (base_length/pointsPerSide)
@@ -103,7 +103,7 @@ while True:
             print("y val")
             print(y)
             
-            distanceval = calculate_distance(x-15,y-10)
+            distanceval = calculate_distance(x,y)
             angleval = solve_angle_c(130,130, distanceval)
             subsubAngle = math.atan(x/y)
             subAngle = math.degrees(subsubAngle)
@@ -116,7 +116,7 @@ while True:
             set_servo_angle(0,(90 +((180-angleval)/2)) - subAngle/2)
             set_servo_angle(1, angleval)
     k = 3
-    if k == 3:#frontright
+    if k == 3:
         for i in range(totalPoints+1):
             if i < pointsPerSide:
                 x = i *  (base_length/pointsPerSide)
@@ -135,7 +135,7 @@ while True:
             print("y val")
             print(y)
             
-            distanceval = calculate_distance(x-15,y-10)
+            distanceval = calculate_distance(x,y)
             angleval = solve_angle_c(130,130, distanceval)
             subsubAngle = math.atan(x/y)
             subAngle = math.degrees(subsubAngle)
@@ -148,7 +148,7 @@ while True:
             set_servo_angle(7, (90 -((180-angleval)/2)) + subAngle/2 )
             set_servo_angle(8, 180- angleval)
     k = 4
-    if k == 4:#frontleft
+    if k == 4:
         for i in range(totalPoints+1):
             if i < pointsPerSide:
                 x = i *  (base_length/pointsPerSide)
@@ -167,7 +167,7 @@ while True:
             print("y val")
             print(y)
             
-            distanceval = calculate_distance(x-15,y+40)
+            distanceval = calculate_distance(x,y)
             angleval = solve_angle_c(130,130, distanceval)
             subsubAngle = math.atan(x/y)
             subAngle = math.degrees(subsubAngle)
