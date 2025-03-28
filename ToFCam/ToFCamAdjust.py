@@ -83,18 +83,18 @@ def main():
 
     # Initialize camera
     cam = ac.ArducamCamera()
-    ret = cam.open(ac.TOFConnect.CSI, 0)
+    ret = cam.open(ac.Connection.CSI, 0)
     if ret != 0:
         print("Failed to open camera. Error code:", ret)
         return
 
-    ret = cam.start(ac.TOFOutput.DEPTH)
+    ret = cam.start(ac.FrameType.DEPTH)
     if ret != 0:
         print("Failed to start camera. Error code:", ret)
         cam.close()
         return
 
-    r = cam.getControl(ac.TOFControl.RANGE)
+    r = cam.getControl(ac.Control.RANGE)
     info = cam.getCameraInfo()
     print(f"Camera resolution: {info.width}x{info.height}")
 
@@ -102,14 +102,14 @@ def main():
     cv2.namedWindow("preview", cv2.WINDOW_AUTOSIZE)
     cv2.setMouseCallback("preview", on_mouse)
 
-    if info.device_type == ac.TOFDeviceType.VGA:
+    if info.device_type == ac.DeviceType.VGA:
         cv2.createTrackbar("confidence", "preview", confidence_value, 255, on_confidence_changed)
 
     while True:
         frame = cam.requestFrame(2000)
         if frame is not None and isinstance(frame, ac.DepthData):
             # Retrieve depth and confidence data
-            depth_buf = frame.getDepthData()
+            depth_buf = frame.depth_data()
             confidence_buf = frame.getConfidenceData()
             depth_buf = np.clip(depth_buf, 0, 2000)  # Clip depth range
 
