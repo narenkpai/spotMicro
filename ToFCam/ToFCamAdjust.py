@@ -109,8 +109,8 @@ def main():
         frame = cam.requestFrame(2000)
         if frame is not None and isinstance(frame, ac.DepthData):
             # Retrieve depth and confidence data
-            depth_buf = frame.depth_data()
-            confidence_buf = frame.getConfidenceData()
+            depth_buf = frame.depth_data
+            confidence_buf = frame.confidence_data
             depth_buf = np.clip(depth_buf, 0, 2000)  # Clip depth range
 
             # Convert depth data to color map
