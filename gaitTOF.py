@@ -6,6 +6,7 @@ import busio
 import cv2
 import numpy as np
 import ArducamDepthCamera as ac
+import matplotlib.pyplot as plt
 
 i2c = busio.I2C(SCL, SDA)
 
@@ -119,7 +120,6 @@ def resolveFrame():
             slice(center_y - rect_size, center_y + rect_size),
             slice(center_x - rect_size, center_x + rect_size),
         )
-
         # Draw center rectangle
         cv2.rectangle(result_image, 
                         (center_x - rect_size, center_y - rect_size), 
@@ -142,146 +142,189 @@ base_length = 30
 height = 10
 pointsPerSide = 15
 totalPoints = 45
+vertical_distance = 10
 k = 1
-
 while True:
-    if k == 1:#backleft
-        base_length - (resolveFrame/10)
-        for i in range(totalPoints+1):
-            if i < pointsPerSide:
-                x = i *  (base_length/pointsPerSide)
-                y = 1 + (i * .1)
-            elif i <= pointsPerSide * 2:
-                step = i - pointsPerSide
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                y = 1 + step * (height / pointsPerSide)
-            else:
-                step = i - (pointsPerSide * 2)
-                x = (base_length /2) - step * ((base_length/2) / pointsPerSide)
-                y =  1 +height - step * (height/pointsPerSide)
-            print("x val ")
-            print(x)
-            print("y val")
-            print(y)
-            
-            distanceval = calculate_distance(x-15,y)
-            angleval = solve_angle_c(130,130, distanceval)
-            subsubAngle = math.atan(x/y)
+    if k == 1:  # backleft
+        # Adjust the vertical distance using the resolved frame value
+        adjusted_vertical_distance = vertical_distance - (resolveFrame() / 10)
+        
+        # Define triangle vertices with point 2 at the origin
+        p2 = np.array([0, 0])
+        p1 = np.array([-base_length/2, -adjusted_vertical_distance])
+        p3 = np.array([ base_length/2, -adjusted_vertical_distance])
+        
+        # Generate coordinate points along each side of the triangle
+        side1_points = np.column_stack((
+            np.linspace(p1[0], p2[0], pointsPerSide),
+            np.linspace(p1[1], p2[1], pointsPerSide)
+        ))
+        side2_points = np.column_stack((
+            np.linspace(p2[0], p3[0], pointsPerSide),
+            np.linspace(p2[1], p3[1], pointsPerSide)
+        ))
+        side3_points = np.column_stack((
+            np.linspace(p3[0], p1[0], pointsPerSide),
+            np.linspace(p3[1], p1[1], pointsPerSide)
+        ))
+        
+        # Concatenate all side points into a single array
+        all_points = np.concatenate((side2_points, side1_points, side3_points), axis=0)
+        
+        # Iterate over each point and process servo commands
+        for pt in all_points:
+            x, y = pt[0], pt[1]
+            print("x val ", x)
+            print("y val ", y)
+            distanceval = calculate_distance(x - 15, y)
+            angleval = solve_angle_c(130, 130, distanceval)
+            # Caution: ensure y is not zero to avoid division error
+            subsubAngle = math.atan(x / y) if y != 0 else 0
             subAngle = math.degrees(subsubAngle)
-            print("tan angle")
-            print(subAngle)
+            print("tan angle ", subAngle)
+            
             set_servo_angle(5, 0)
             set_servo_angle(4, 180)
             set_servo_angle(10, 180)
             set_servo_angle(11, 0)
-            set_servo_angle(6, (90 -((180-angleval)/2)) + subAngle/2)
+            set_servo_angle(6, (90 - ((180 - angleval) / 2)) + subAngle / 2)
             set_servo_angle(9, 180 - angleval)
     k = 2
-    if k == 2:#backright
-        base_length - (resolveFrame/10)
-        for i in range(totalPoints+1):
-            if i < pointsPerSide:
-                x = i *  (base_length/pointsPerSide)
-                y = 1 + (i * .1)
-            elif i <= pointsPerSide * 2:
-                step = i - pointsPerSide
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                y = 1 + step * (height / pointsPerSide)
-            else:
-                step = i - (pointsPerSide * 2)
-                x = (base_length /2) - step * ((base_length/2) / pointsPerSide)
-                y =  1 +height - step * (height/pointsPerSide)
-            print("x val ")
-            print(x)
-            print("y val")
-            print(y)
+    if k == 2:  # backright
+        # Adjust the vertical distance using the resolved frame value
+        adjusted_vertical_distance = vertical_distance - (resolveFrame() / 10)
+        
+        # Define triangle vertices with point 2 at the origin
+        p2 = np.array([0, 0])
+        p1 = np.array([-base_length/2, -adjusted_vertical_distance])
+        p3 = np.array([ base_length/2, -adjusted_vertical_distance])
+        
+        # Generate coordinate points along each side of the triangle
+        side1_points = np.column_stack((
+            np.linspace(p1[0], p2[0], pointsPerSide),
+            np.linspace(p1[1], p2[1], pointsPerSide)
+        ))
+        side2_points = np.column_stack((
+            np.linspace(p2[0], p3[0], pointsPerSide),
+            np.linspace(p2[1], p3[1], pointsPerSide)
+        ))
+        side3_points = np.column_stack((
+            np.linspace(p3[0], p1[0], pointsPerSide),
+            np.linspace(p3[1], p1[1], pointsPerSide)
+        ))
+        
+        # Concatenate all side points into a single array
+        all_points = np.concatenate((side2_points, side1_points, side3_points), axis=0)
+        
+        # Iterate over each point and process servo commands
+        for pt in all_points:
+            x, y = pt[0], pt[1]
+            print("x val ", x)
+            print("y val ", y)
             
-            distanceval = calculate_distance(x-15,y-10)
-            angleval = solve_angle_c(130,130, distanceval)
-            subsubAngle = math.atan(x/y)
+            distanceval = calculate_distance(x - 15, y - 10)
+            angleval = solve_angle_c(130, 130, distanceval)
+            subsubAngle = math.atan(x / y) if y != 0 else 0
             subAngle = math.degrees(subsubAngle)
-            print("tan angle")
-            print(subAngle)
+            print("tan angle ", subAngle)
+            
             set_servo_angle(5, 0)
             set_servo_angle(4, 180)
             set_servo_angle(10, 180)
             set_servo_angle(11, 0)
-            set_servo_angle(0,(90 +((180-angleval)/2)) - subAngle/2)
+            set_servo_angle(0, (90 + ((180 - angleval) / 2)) - subAngle / 2)
             set_servo_angle(1, angleval)
     k = 3
-    if k == 3:#frontright
-        base_length - (resolveFrame/10)
-        for i in range(totalPoints+1):
-            if i < pointsPerSide:
-                x = i *  (base_length/pointsPerSide)
-                y = 1 + (i * .1)
-            elif i <= pointsPerSide * 2:
-                step = i - pointsPerSide
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                y = 1 + step * (height / pointsPerSide)
-            else:
-                step = i - (pointsPerSide * 2)
-                x = (base_length /2) - step * ((base_length/2) / pointsPerSide)
-                y =  1 +height - step * (height/pointsPerSide)
-            print("x val ")
-            print(x)
-            print("y val")
-            print(y)
+    if k == 3:  # frontright
+        # Adjust the vertical distance using the resolved frame value
+        adjusted_vertical_distance = vertical_distance - (resolveFrame() / 10)
+        
+        # Define triangle vertices with point 2 at the origin
+        p2 = np.array([0, 0])
+        p1 = np.array([-base_length/2, -adjusted_vertical_distance])
+        p3 = np.array([ base_length/2, -adjusted_vertical_distance])
+        
+        # Generate coordinate points along each side of the triangle
+        side1_points = np.column_stack((
+            np.linspace(p1[0], p2[0], pointsPerSide),
+            np.linspace(p1[1], p2[1], pointsPerSide)
+        ))
+        side2_points = np.column_stack((
+            np.linspace(p2[0], p3[0], pointsPerSide),
+            np.linspace(p2[1], p3[1], pointsPerSide)
+        ))
+        side3_points = np.column_stack((
+            np.linspace(p3[0], p1[0], pointsPerSide),
+            np.linspace(p3[1], p1[1], pointsPerSide)
+        ))
+        
+        # Concatenate all side points into a single array
+        all_points = np.concatenate((side2_points, side1_points, side3_points), axis=0)
+        
+        # Iterate over each point and process servo commands
+        for pt in all_points:
+            x, y = pt[0], pt[1]
+            print("x val ", x)
+            print("y val ", y)
             
-            distanceval = calculate_distance(x-15,y-10)
-            angleval = solve_angle_c(130,130, distanceval)
-            subsubAngle = math.atan(x/y)
+            distanceval = calculate_distance(x - 15, y - 10)
+            angleval = solve_angle_c(130, 130, distanceval)
+            subsubAngle = math.atan(x / y) if y != 0 else 0
             subAngle = math.degrees(subsubAngle)
-            print("tan angle")
-            print(subAngle)
+            print("tan angle ", subAngle)
+            
             set_servo_angle(5, 0)
             set_servo_angle(4, 180)
             set_servo_angle(10, 180)
             set_servo_angle(11, 0)
-            set_servo_angle(7, (90 -((180-angleval)/2)) + subAngle/2 )
-            set_servo_angle(8, 180- angleval)
+            set_servo_angle(7, (90 - ((180 - angleval) / 2)) + subAngle / 2)
+            set_servo_angle(8, 180 - angleval)
     k = 4
-    if k == 4:#frontleft
-        base_length - (resolveFrame/10)
-        for i in range(totalPoints+1):
-            if i < pointsPerSide:
-                x = i *  (base_length/pointsPerSide)
-                y = 1 + (i * .1)
-            elif i <= pointsPerSide * 2:
-                step = i - pointsPerSide
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                x = base_length - step * ((base_length/2) /  pointsPerSide)
-                y = 1 + step * (height / pointsPerSide)
-            else:
-                step = i - (pointsPerSide * 2)
-                x = (base_length /2) - step * ((base_length/2) / pointsPerSide)
-                y =  1 +height - step * (height/pointsPerSide)
-            print("x val ")
-            print(x)
-            print("y val")
-            print(y)
+    if k == 4:  # frontleft
+        # Adjust the vertical distance using the resolved frame value
+        adjusted_vertical_distance = vertical_distance - (resolveFrame() / 10)
+        
+        # Define triangle vertices with point 2 at the origin
+        p2 = np.array([0, 0])
+        p1 = np.array([-base_length/2, -adjusted_vertical_distance])
+        p3 = np.array([ base_length/2, -adjusted_vertical_distance])
+        
+        # Generate coordinate points along each side of the triangle
+        side1_points = np.column_stack((
+            np.linspace(p1[0], p2[0], pointsPerSide),
+            np.linspace(p1[1], p2[1], pointsPerSide)
+        ))
+        side2_points = np.column_stack((
+            np.linspace(p2[0], p3[0], pointsPerSide),
+            np.linspace(p2[1], p3[1], pointsPerSide)
+        ))
+        side3_points = np.column_stack((
+            np.linspace(p3[0], p1[0], pointsPerSide),
+            np.linspace(p3[1], p1[1], pointsPerSide)
+        ))
+        
+        # Concatenate all side points into a single array
+        all_points = np.concatenate((side2_points, side1_points, side3_points), axis=0)
+        
+        # Iterate over each point and process servo commands
+        for pt in all_points:
+            x, y = pt[0], pt[1]
+            print("x val ", x)
+            print("y val ", y)
             
-            distanceval = calculate_distance(x-15,y+40)
-            angleval = solve_angle_c(130,130, distanceval)
-            subsubAngle = math.atan(x/y)
+            distanceval = calculate_distance(x - 15, y + 40)
+            angleval = solve_angle_c(130, 130, distanceval)
+            subsubAngle = math.atan(x / y) if y != 0 else 0
             subAngle = math.degrees(subsubAngle)
-            print("tan angle")
-            print(subAngle)
+            print("tan angle ", subAngle)
+            
             set_servo_angle(5, 0)
             set_servo_angle(4, 180)
             set_servo_angle(10, 180)
             set_servo_angle(11, 0)
-            set_servo_angle(2,(90 +((180-angleval)/2)) - subAngle/2 )
+            set_servo_angle(2, (90 + ((180 - angleval) / 2)) - subAngle / 2)
             set_servo_angle(3, angleval)
             k = 1
 
-
-
-
-
 # Optionally, de-initialize the PCA9685
 pca.deinit()
- 
